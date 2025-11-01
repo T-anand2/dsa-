@@ -10,13 +10,16 @@ class User(UserMixin, db.Model):
     username = db.Column(db.String(80), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(255), nullable=False)
+    aadhaar_number = db.Column(db.String(12), unique=True, nullable=True)
+    phone_number = db.Column(db.String(15), nullable=True)
     role = db.Column(db.String(20), default='voter')
-    is_verified = db.Column(db.Boolean, default=True)
+    is_verified = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     last_login = db.Column(db.DateTime)
     
     votes = db.relationship('Vote', backref='user', lazy=True, cascade='all, delete-orphan')
     voting_patterns = db.relationship('VotingPattern', backref='user', lazy=True, cascade='all, delete-orphan')
+    otps = db.relationship('OTP', backref='user', lazy=True, cascade='all, delete-orphan')
     
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
