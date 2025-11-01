@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+
+{% block title %}Results - {{ election.title }}{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('voter.dashboard') }}">Dashboard</a></li>
+                <li class="breadcrumb-item active">Election Results</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col">
+        <div class="card shadow">
+            <div class="card-header bg-success text-white">
+                <h3 class="mb-0"><i class="bi bi-trophy"></i> {{ election.title }} - Results</h3>
+            </div>
+            <div class="card-body">
+                <p class="lead">{{ election.description }}</p>
+                <p><strong>Total Votes Cast:</strong> {{ total_votes }}</p>
+                <p><strong>Election Ended:</strong> {{ election.end_date.strftime('%Y-%m-%d %H:%M') }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-bar-chart-fill"></i> Vote Distribution</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="resultsChart"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card shadow">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-list-ol"></i> Rankings</h5>
+            </div>
+            <div class="card-body">
+                <div class="list-group">
+                    {% for result in results|sort(attribute='vote_count', reverse=True) %}
+                    <div class="list-group-item">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1">{{ result.name }}</h6>
+                                <small class="text-muted">{{ result.party }}</small>
+                            </div>
+                            <span class="badge bg-primary rounded-pill">{{ result.vote_count }}</span>
+                        </div>
+                        {% if total_votes > 0 %}
+                        <div class="progress mt-2" style="height: 20px;">
+                            <div class="progress-bar" role="progressbar" style="width: {{ (result.vote_count / total_votes * 100)|round(1) }}%">
+                                {{ (result.vote_count / total_votes * 100)|round(1) }}%
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col">
+        <a href="{{ url_for('voter.dashboard') }}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Back to Dashboard
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const ctx = document.getElementById('resultsChart').getContext('2d');
+    const resultsChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: [{% for result in results %}'{{ result.name }}'{% if not loop.last %}, {% endif %}{% endfor %}],
+            datasets: [{
+                label: 'Votes',
+                data: [{% for result in results %}{{ result.vote_count }}{% if not loop.last %}, {% endif %}{% endfor %}],
+                backgroundColor: [
+                    'rgba(54, 162, 235, 0.8)',
+                    'rgba(255, 99, 132, 0.8)',
+                    'rgba(75, 192, 192, 0.8)',
+                    'rgba(255, 206, 86, 0.8)',
+                    'rgba(153, 102, 255, 0.8)',
+                    'rgba(255, 159, 64, 0.8)'
+                ],
+                borderColor: [
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)'
+                ],
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                title: {
+                    display: true,
+                    text: 'Election Results',
+                    font: {
+                        size: 16
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

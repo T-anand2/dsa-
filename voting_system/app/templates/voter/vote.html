@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block title %}Cast Vote - {{ election.title }}{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('voter.dashboard') }}">Dashboard</a></li>
+                <li class="breadcrumb-item active">Cast Vote</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h3 class="mb-0"><i class="bi bi-ballot"></i> {{ election.title }}</h3>
+            </div>
+            <div class="card-body">
+                <p class="lead">{{ election.description }}</p>
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Start Date:</strong> {{ election.start_date.strftime('%Y-%m-%d %H:%M') }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>End Date:</strong> {{ election.end_date.strftime('%Y-%m-%d %H:%M') }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col">
+        <h4><i class="bi bi-people"></i> Select Your Candidate</h4>
+        <hr>
+    </div>
+</div>
+
+<form method="POST" action="{{ url_for('voter.cast_vote', election_id=election.id) }}" id="voteForm">
+    <input type="hidden" name="time_spent" id="timeSpent" value="0">
+    
+    <div class="row">
+        {% for candidate in candidates %}
+        <div class="col-md-6 mb-4">
+            <div class="card candidate-card shadow-sm h-100">
+                <div class="card-body">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="candidate_id" id="candidate{{ candidate.id }}" value="{{ candidate.id }}" required>
+                        <label class="form-check-label w-100" for="candidate{{ candidate.id }}">
+                            <div class="d-flex align-items-center">
+                                <div class="candidate-avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 60px; height: 60px; font-size: 1.5rem;">
+                                    {{ candidate.name[0] }}
+                                </div>
+                                <div>
+                                    <h5 class="mb-1">{{ candidate.name }}</h5>
+                                    <p class="text-muted mb-0"><i class="bi bi-flag"></i> {{ candidate.party }}</p>
+                                </div>
+                            </div>
+                            {% if candidate.description %}
+                            <p class="mt-3 mb-0">{{ candidate.description }}</p>
+                            {% endif %}
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="row mt-4">
+        <div class="col">
+            <div class="alert alert-warning">
+                <i class="bi bi-exclamation-triangle"></i> <strong>Important:</strong> You can only vote once in this election. Please review your selection carefully before submitting.
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col">
+            <button type="submit" class="btn btn-success btn-lg w-100" id="submitBtn">
+                <i class="bi bi-check-circle"></i> Submit Vote
+            </button>
+        </div>
+    </div>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    let startTime = Date.now();
+    
+    document.getElementById('voteForm').addEventListener('submit', function() {
+        let timeSpent = Math.floor((Date.now() - startTime) / 1000);
+        document.getElementById('timeSpent').value = timeSpent;
+    });
+    
+    document.querySelectorAll('.candidate-card').forEach(card => {
+        card.addEventListener('click', function() {
+            const radio = this.querySelector('input[type="radio"]');
+            radio.checked = true;
+            
+            document.querySelectorAll('.candidate-card').forEach(c => {
+                c.classList.remove('border-primary', 'border-3');
+            });
+            this.classList.add('border-primary', 'border-3');
+        });
+    });
+</script>
+{% endblock %}

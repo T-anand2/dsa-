@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+
+{% block title %}Suspicious Votes - Admin{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h1 class="display-6"><i class="bi bi-shield-exclamation text-danger"></i> Suspicious Voting Activity</h1>
+        <p class="text-muted">AI-detected suspicious voting patterns and potential fraud</p>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card text-center shadow-sm border-danger">
+            <div class="card-body">
+                <i class="bi bi-exclamation-triangle-fill text-danger" style="font-size: 3rem;"></i>
+                <h3 class="mt-3">{{ suspicious_votes|length }}</h3>
+                <p class="text-muted mb-0">Suspicious Votes</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center shadow-sm border-warning">
+            <div class="card-body">
+                <i class="bi bi-flag-fill text-warning" style="font-size: 3rem;"></i>
+                <h3 class="mt-3">{{ patterns|length }}</h3>
+                <p class="text-muted mb-0">Flagged Patterns</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center shadow-sm border-info">
+            <div class="card-body">
+                <i class="bi bi-robot text-info" style="font-size: 3rem;"></i>
+                <h3 class="mt-3">AI</h3>
+                <p class="text-muted mb-0">Powered Detection</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col">
+        <div class="card shadow">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0"><i class="bi bi-exclamation-octagon"></i> Suspicious Votes</h5>
+            </div>
+            <div class="card-body">
+                {% if suspicious_votes %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Vote ID</th>
+                                <th>User</th>
+                                <th>Election</th>
+                                <th>Candidate</th>
+                                <th>Timestamp</th>
+                                <th>IP Address</th>
+                                <th>Reason</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for vote in suspicious_votes %}
+                            <tr class="table-danger">
+                                <td>{{ vote.id }}</td>
+                                <td><strong>{{ vote.user.username }}</strong></td>
+                                <td>{{ vote.election.title }}</td>
+                                <td>{{ vote.candidate.name }}</td>
+                                <td>{{ vote.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                                <td><code>{{ vote.ip_address }}</code></td>
+                                <td>
+                                    <span class="badge bg-danger">AI Detected</span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="alert alert-success mb-0">
+                    <i class="bi bi-check-circle"></i> No suspicious votes detected. The system is secure!
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col">
+        <div class="card shadow">
+            <div class="card-header bg-warning">
+                <h5 class="mb-0"><i class="bi bi-graph-up"></i> Flagged Voting Patterns</h5>
+            </div>
+            <div class="card-body">
+                {% if patterns %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Pattern ID</th>
+                                <th>User</th>
+                                <th>Election</th>
+                                <th>Vote Hour</th>
+                                <th>Time Spent (s)</th>
+                                <th>Anomaly Score</th>
+                                <th>IP Address</th>
+                                <th>Detected At</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for pattern in patterns %}
+                            <tr class="table-warning">
+                                <td>{{ pattern.id }}</td>
+                                <td><strong>{{ pattern.user.username }}</strong></td>
+                                <td>{{ pattern.election_id }}</td>
+                                <td>{{ pattern.vote_time_hour }}:00</td>
+                                <td>{{ pattern.time_spent_seconds }}</td>
+                                <td>
+                                    <span class="badge bg-{% if pattern.anomaly_score < -0.5 %}danger{% elif pattern.anomaly_score < 0 %}warning{% else %}info{% endif %}">
+                                        {{ pattern.anomaly_score|round(3) }}
+                                    </span>
+                                </td>
+                                <td><code>{{ pattern.ip_address }}</code></td>
+                                <td>{{ pattern.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="alert alert-success mb-0">
+                    <i class="bi bi-check-circle"></i> No suspicious patterns detected.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col">
+        <div class="card shadow">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="bi bi-info-circle"></i> AI Fraud Detection Features</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6><i class="bi bi-check2-circle text-success"></i> Detection Criteria:</h6>
+                        <ul>
+                            <li>Duplicate voting attempts</li>
+                            <li>Multiple votes from same IP</li>
+                            <li>Unusually fast voting (< 5 seconds)</li>
+                            <li>Voting during unusual hours (late night)</li>
+                            <li>Anomalous behavioral patterns</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6><i class="bi bi-cpu text-primary"></i> AI Model:</h6>
+                        <ul>
+                            <li>Algorithm: Isolation Forest</li>
+                            <li>Features: 6 behavioral indicators</li>
+                            <li>Training: Adaptive learning</li>
+                            <li>Accuracy: Real-time detection</li>
+                            <li>Action: Automatic flagging</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

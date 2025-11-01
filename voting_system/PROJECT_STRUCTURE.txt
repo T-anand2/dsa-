@@ -1,0 +1,242 @@
+AI-BASED ONLINE VOTING SYSTEM - PROJECT STRUCTURE
+==================================================
+
+voting_system/
+│
+├── app/                                    # Main application package
+│   ├── __init__.py                        # Flask app initialization & configuration
+│   │
+│   ├── models/                            # Database models (SQLAlchemy)
+│   │   ├── __init__.py                   # Models package init
+│   │   ├── user.py                       # User model (voters & admins)
+│   │   ├── election.py                   # Election model
+│   │   ├── candidate.py                  # Candidate model
+│   │   ├── vote.py                       # Vote model
+│   │   └── voting_pattern.py             # Voting pattern for AI analysis
+│   │
+│   ├── routes/                            # Application routes (blueprints)
+│   │   ├── __init__.py                   # Routes package init
+│   │   ├── auth.py                       # Authentication routes (login/signup/logout)
+│   │   ├── voter.py                      # Voter routes (dashboard, voting, results)
+│   │   └── admin.py                      # Admin routes (manage elections, view stats)
+│   │
+│   ├── utils/                             # Utility functions
+│   │   ├── __init__.py                   # Utils package init
+│   │   ├── fraud_detection.py            # AI-based fraud detection (Isolation Forest)
+│   │   └── seed_data.py                  # Initial data seeding
+│   │
+│   ├── templates/                         # HTML templates (Jinja2)
+│   │   ├── base.html                     # Base template with navbar & footer
+│   │   │
+│   │   ├── auth/                         # Authentication templates
+│   │   │   ├── login.html               # Login page
+│   │   │   └── signup.html              # Registration page
+│   │   │
+│   │   ├── voter/                        # Voter templates
+│   │   │   ├── dashboard.html           # Voter dashboard
+│   │   │   ├── vote.html                # Voting page
+│   │   │   └── results.html             # Election results
+│   │   │
+│   │   └── admin/                        # Admin templates
+│   │       ├── dashboard.html           # Admin dashboard with stats
+│   │       ├── elections.html           # Manage elections
+│   │       ├── create_election.html     # Create new election
+│   │       ├── add_candidates.html      # Add candidates to election
+│   │       ├── results.html             # View election results
+│   │       ├── users.html               # Manage users
+│   │       └── suspicious_votes.html    # View suspicious activity
+│   │
+│   └── static/                            # Static files (CSS, JS, images)
+│       ├── css/
+│       │   └── style.css                 # Custom styles
+│       ├── js/
+│       │   └── main.js                   # Custom JavaScript
+│       └── images/                        # Image assets
+│
+├── instance/                              # Instance folder (created at runtime)
+│   └── voting_system.db                  # SQLite database (auto-generated)
+│
+├── migrations/                            # Database migrations (if using Flask-Migrate)
+│
+├── requirements.txt                       # Python dependencies
+├── run.py                                 # Application entry point
+├── .gitignore                            # Git ignore file
+├── README.md                             # Comprehensive documentation
+├── SETUP_GUIDE.md                        # Quick setup guide
+└── PROJECT_STRUCTURE.txt                 # This file
+
+==================================================
+TECHNOLOGY STACK
+==================================================
+
+Backend:
+- Flask 3.0.0                             # Web framework
+- Flask-SQLAlchemy 3.1.1                  # ORM
+- Flask-Login 0.6.3                       # User session management
+- Flask-WTF 1.2.1                         # Form handling
+- Werkzeug 3.0.1                          # Password hashing
+- scikit-learn 1.3.2                      # Machine learning (AI fraud detection)
+- NumPy 1.26.2                            # Numerical computing
+- Pandas 2.1.4                            # Data analysis
+
+Frontend:
+- Bootstrap 5.3                           # CSS framework
+- Bootstrap Icons 1.11                    # Icon library
+- Chart.js 4.4                            # Data visualization
+- Vanilla JavaScript                      # Client-side scripting
+
+Database:
+- SQLite (default)                        # Can be switched to MySQL/PostgreSQL
+
+==================================================
+KEY FEATURES
+==================================================
+
+✅ User Authentication
+   - Secure login/signup
+   - Password hashing with Werkzeug
+   - Session management with Flask-Login
+   - Role-based access (voter/admin)
+
+✅ Voting System
+   - One vote per user per election
+   - Real-time vote counting
+   - Election scheduling (start/end dates)
+   - Multiple concurrent elections
+
+✅ AI Fraud Detection
+   - Isolation Forest algorithm
+   - 6 behavioral features analyzed
+   - Automatic suspicious vote flagging
+   - Real-time pattern analysis
+
+✅ Admin Dashboard
+   - Create and manage elections
+   - Add candidates
+   - View statistics
+   - Monitor suspicious activity
+   - Interactive charts
+
+✅ Voter Dashboard
+   - View active elections
+   - Cast votes securely
+   - View results
+   - User-friendly interface
+
+✅ Security
+   - Password hashing
+   - CSRF protection
+   - SQL injection prevention
+   - Session security
+   - IP tracking
+
+==================================================
+DATABASE SCHEMA
+==================================================
+
+users
+├── id (Primary Key)
+├── username (Unique)
+├── email (Unique)
+├── password_hash
+├── role (voter/admin)
+├── is_verified
+├── created_at
+└── last_login
+
+elections
+├── id (Primary Key)
+├── title
+├── description
+├── start_date
+├── end_date
+├── is_active
+└── created_at
+
+candidates
+├── id (Primary Key)
+├── name
+├── party
+├── description
+├── photo_url
+└── election_id (Foreign Key)
+
+votes
+├── id (Primary Key)
+├── user_id (Foreign Key)
+├── candidate_id (Foreign Key)
+├── election_id (Foreign Key)
+├── timestamp
+├── ip_address
+├── user_agent
+└── is_suspicious
+
+voting_patterns
+├── id (Primary Key)
+├── user_id (Foreign Key)
+├── election_id (Foreign Key)
+├── vote_time_hour
+├── time_spent_seconds
+├── ip_address
+├── device_fingerprint
+├── anomaly_score
+├── is_flagged
+└── created_at
+
+==================================================
+DEMO CREDENTIALS
+==================================================
+
+Admin:
+Username: admin
+Password: admin123
+
+Voters:
+Username: john_doe
+Password: password123
+
+Username: jane_smith
+Password: password123
+
+==================================================
+SETUP INSTRUCTIONS
+==================================================
+
+1. Create virtual environment:
+   python -m venv venv
+   
+2. Activate virtual environment:
+   Windows: venv\Scripts\activate
+   macOS/Linux: source venv/bin/activate
+
+3. Install dependencies:
+   pip install -r requirements.txt
+
+4. Run application:
+   python run.py
+
+5. Access at:
+   http://localhost:5000
+
+==================================================
+AI FRAUD DETECTION DETAILS
+==================================================
+
+Algorithm: Isolation Forest
+Contamination Rate: 10%
+Features Analyzed:
+1. Vote time hour (0-23)
+2. Time spent on voting page (seconds)
+3. Same IP vote count
+4. User total vote count
+5. Time between consecutive votes
+6. Unusual hour detection (late night)
+
+Detection Triggers:
+- Duplicate voting attempts
+- Multiple votes from same IP (>5)
+- Very fast voting (<5 seconds)
+- Voting during unusual hours
+- Anomalous ML score
+
+==================================================

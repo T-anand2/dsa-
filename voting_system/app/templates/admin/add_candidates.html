@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}Add Candidates - {{ election.title }}{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('admin.dashboard') }}">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('admin.elections') }}">Elections</a></li>
+                <li class="breadcrumb-item active">Add Candidates</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0"><i class="bi bi-calendar-event"></i> {{ election.title }}</h4>
+            </div>
+            <div class="card-body">
+                <p>{{ election.description }}</p>
+                <p class="mb-0"><strong>Duration:</strong> {{ election.start_date.strftime('%Y-%m-%d') }} to {{ election.end_date.strftime('%Y-%m-%d') }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-5">
+        <div class="card shadow">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="bi bi-person-plus"></i> Add New Candidate</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('admin.add_candidates', election_id=election.id) }}">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Candidate Name *</label>
+                        <input type="text" class="form-control" id="name" name="name" required placeholder="Full name">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="party" class="form-label">Party/Affiliation</label>
+                        <input type="text" class="form-control" id="party" name="party" placeholder="Political party or independent">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" id="description" name="description" rows="3" placeholder="Brief bio or campaign message"></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-success w-100">
+                        <i class="bi bi-plus-circle"></i> Add Candidate
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="mt-3">
+            <a href="{{ url_for('admin.elections') }}" class="btn btn-secondary w-100">
+                <i class="bi bi-check-circle"></i> Done Adding Candidates
+            </a>
+        </div>
+    </div>
+
+    <div class="col-md-7">
+        <div class="card shadow">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="bi bi-people"></i> Candidates List ({{ candidates|length }})</h5>
+            </div>
+            <div class="card-body">
+                {% if candidates %}
+                <div class="list-group">
+                    {% for candidate in candidates %}
+                    <div class="list-group-item">
+                        <div class="d-flex align-items-center">
+                            <div class="candidate-avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px; font-size: 1.2rem;">
+                                {{ candidate.name[0] }}
+                            </div>
+                            <div class="flex-grow-1">
+                                <h6 class="mb-1">{{ candidate.name }}</h6>
+                                <p class="text-muted mb-0"><i class="bi bi-flag"></i> {{ candidate.party or 'Independent' }}</p>
+                                {% if candidate.description %}
+                                <small class="text-muted">{{ candidate.description[:100] }}{% if candidate.description|length > 100 %}...{% endif %}</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="alert alert-warning mb-0">
+                    <i class="bi bi-exclamation-triangle"></i> No candidates added yet. Add at least 2 candidates to start the election.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
